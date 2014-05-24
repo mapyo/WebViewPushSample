@@ -1,3 +1,6 @@
+# application
+MyWebViewPushApp/src/main/java/com/mapyo/mywebviewpushapp/util/CommonUtils.java
+
 #built application files
 *.apk
 *.ap_
