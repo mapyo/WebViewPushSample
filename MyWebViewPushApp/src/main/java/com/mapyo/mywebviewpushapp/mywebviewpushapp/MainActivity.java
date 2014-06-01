@@ -16,11 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.mapyo.mywebviewpushapp.util.CommonUtils;
 
 import java.io.IOException;
 
@@ -39,6 +39,9 @@ public class MainActivity extends ActionBarActivity {
     private Context mContext;
     private GoogleCloudMessaging mGcm;
     private String mRegiId;
+
+    // サーバ通信用
+    private AsyncTask<Void, Void, Void> mRegisterTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,45 +80,37 @@ public class MainActivity extends ActionBarActivity {
      * shared preferences.
      */
     private void registerInBackground() {
-        new AsyncTask() {
+        // GCM登録用AsyncTaskの実行
+        mRegisterTask = new AsyncTask<Void, Void, Void>() {
             @Override
-            protected String doInBackground(Void... paramas) {
-                String msg = "";
-                try {
-                    if (mGcm == null) {
-                        mGcm = GoogleCloudMessaging.getInstance(mContext);
-                    }
-                    mRegiId = mGcm.register(SENDER_ID);
-                    msg = "Device registered, registration ID=" + mRegiId;
-
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-                    // The request to your server should be authenticated if your app
-                    // is using accounts.
-                    // 今回は特にサーバ側に送らないのでコメントアウト
-                    //sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the
-                    // message using the 'from' address in the message.
-
-                    // Persist the regID - no need to register again.
-                    storeRegistrationId(mContext, mRegiId);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
+            protected Void doInBackground(Void... params) {
+                if (mGcm == null) {
+                    // インスタンスがなければ取得する
+                    mGcm = GoogleCloudMessaging.getInstance(mContext);
                 }
-                return msg;
+                try {
+                    // GCMサーバーへ登録する
+                    mRegiId = mGcm.register(CommonUtils.SENDER_ID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // レジストレーションIDを自分のサーバーへ送信する
+                // レジストレーションIDをつかえば、アプリケーションにGCMメッセージを送信できるようになります
+                Log.i(TAG,"送信対象のレジストレーションID: " + mRegiId);
+                //今回はサーバ側に保存しない為、関係なし
+                //register(mRegiId);
+
+                // レジストレーションIDを端末に保存
+                storeRegistrationId(mContext, mRegiId);
+                return null;
             }
 
             @Override
-            protected void onPostExecute(String msg) {
-                Log.i(TAG, msg);
+            protected void onPostExecute(Void result) {
+                mRegisterTask = null;
             }
-
-        }.execute(null, null, null);
+        };
+        mRegisterTask.execute(null, null, null);
     }
 
     /**
