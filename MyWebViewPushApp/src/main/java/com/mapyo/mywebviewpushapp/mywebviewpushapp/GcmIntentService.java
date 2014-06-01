@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class GcmIntentService extends IntentService {
-    public static final String TAG = "GCM";
+    public static final String TAG = "MAPYO";
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
 
