@@ -20,7 +20,6 @@ import android.webkit.WebView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.mapyo.mywebviewpushapp.util.CommonUtils;
 
 import java.io.IOException;
 
@@ -90,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 try {
                     // GCMサーバーへ登録する
-                    mRegiId = mGcm.register(CommonUtils.SENDER_ID);
+                    mRegiId = mGcm.register(SENDER_ID);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
