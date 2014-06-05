@@ -65,6 +65,8 @@ public class MainActivity extends ActionBarActivity {
             if(mRegiId.isEmpty()) {
                 // GCMからregistration idを取得
                 registerInBackground();
+            } else {
+                Log.i(TAG,"送信対象のレジストレーションID: " + mRegiId);
             }
         } else {
             // 入っていない場合
